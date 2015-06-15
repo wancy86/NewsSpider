@@ -1,8 +1,12 @@
-var request = require('request');
-var cheerio = require('cheerio');
+var request = require('request'),
+    cheerio = require('cheerio'),
+    http = require('http'),
+    url = require('url');
+
 var express = require('express');
 var app = express();
 var nodemailer = require('nodemailer');
+
 
 var server = app.listen(3000, function() {
     console.log('Listening on port %d', server.address().port);
@@ -29,14 +33,22 @@ var mailOptions = {
     html: '<b>Hello world</b>' // html body
 };
 
-//interval time space
-var timeSpace = 1000*10;
+app.get("/email",function(req,res){
+  res.send("send email");
+  transporter1.sendMail(mailOptions, function(error, info){
+    if(error){
+        console.log(error);
+    }else{
+        console.log('Message sent: ' + info.response);
+    }
+});
+});
 
-// http://news.fx678.com/C/20150613/201506131539001936.shtml
-// /C/20150613/201506131539001936.shtml
+
+
 var host1= 'http://news.fx678.com/news/oil/index.shtml';
 var lasetNews1="";
-var timer1 = setInterval(scraper1, timeSpace);//timeSpace 秒钟更新一次
+var timer1 = setInterval(scraper1, 1000*5);//1 分钟更新一次
 function scraper1 () {
   var host=host1;
   request(host, function (error, response, data) {
@@ -55,13 +67,13 @@ function scraper1 () {
       {
         lasetNews1=news.html();
         //send email remind
-        mailOptions.html="<a href='"+host1+"'>查看源网站</a><br/>"+lasetNews1.replace(/href=\"\/C\//g,'href="http://news.fx678.com/C/');
+        mailOptions.html=lasetNews1;
         mailOptions.subject='原油消息 - FX678';
         transporter1.sendMail(mailOptions, function(error, info){
             if(error){
                 console.log(error);
             }else{
-                console.log('FX678.COM - Message sent: ' + info.response);
+                console.log('Message sent: ' + info.response);
             }
         });
       }//end email send
@@ -72,9 +84,11 @@ function scraper1 () {
 
 }//end scraper
 
+
+
 var host2= 'http://oil.com/latest-news/';
 var lasetNews2="";
-var timer2 = setInterval(scraper2, timeSpace);//timeSpace 秒钟更新一次
+var timer2 = setInterval(scraper2, 1000*5);//1 分钟更新一次
 function scraper2 () {
   var host=host2;
   request(host, function (error, response, data) {
@@ -93,13 +107,13 @@ function scraper2 () {
       {
         lasetNews2=news.html();
         //send email remind
-        mailOptions.html="<a href='"+host2+"'>查看源网站</a><br/>"+lasetNews2;
+        mailOptions.html=lasetNews2;
         mailOptions.subject='原油消息 - OIL';
         transporter1.sendMail(mailOptions, function(error, info){
             if(error){
                 console.log(error);
             }else{
-                console.log('OIL.COM - Message sent: ' + info.response);
+                console.log('Message sent: ' + info.response);
             }
         });
       }//end email send
@@ -111,4 +125,14 @@ function scraper2 () {
 }//end scraper
 
 
+/*
+http.createServer(function (req, res) {
+  var path = url.parse(req.url).pathname;
+  path = path == '/' ? 0 : parseInt(path.slice(1));
+  res.writeHead(200, {"Content-Type":"text/html"});
+  res.end(html[path]);
+}).listen(3000);
 
+console.log('Server running at localhost:3000');
+
+*/

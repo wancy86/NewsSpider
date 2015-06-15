@@ -67,13 +67,13 @@ function scraper1 () {
       {
         lasetNews1=news.html();
         //send email remind
-        mailOptions.html=lasetNews1;
+        mailOptions.html=lasetNews1.replace(/href=\"\/C\//ig,'href="http://news.fx678.com/C/');
         mailOptions.subject='原油消息 - FX678';
         transporter1.sendMail(mailOptions, function(error, info){
             if(error){
                 console.log(error);
             }else{
-                console.log('Message sent: ' + info.response);
+                console.log('FX678.COM - Message sent: ' + info.response);
             }
         });
       }//end email send
@@ -113,7 +113,7 @@ function scraper2 () {
             if(error){
                 console.log(error);
             }else{
-                console.log('Message sent: ' + info.response);
+                console.log('OIL.COM - Message sent: ' + info.response);
             }
         });
       }//end email send
